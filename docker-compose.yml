@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: scamalert-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: scamalert
+      POSTGRES_PASSWORD: scamalert
+      POSTGRES_DB: scamalert
+    ports:
+      - "5432:5432"
+    volumes:
+      - scamalert_pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: scamalert-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql://scamalert:scamalert@db:5432/scamalert
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/app
+
+volumes:
+  scamalert_pgdata:

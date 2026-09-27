@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "ScamAlert",
+    "slug": "scamalert",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#ffffff"
+    },
+    "android": {
+      "package": "com.scamalert.app"
+    },
+    "ios": {
+      "bundleIdentifier": "com.scamalert.app"
+    }
+  }
+}

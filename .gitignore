@@ -1,0 +1,30 @@
+# --- General ---
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+
+# --- Backend (Python) ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# --- Frontend (Node / Expo) ---
+node_modules/
+.expo/
+dist/
+web-build/
+npm-debug.log*
+yarn-error.log*
+
+# --- Docker ---
+*.pid
+
+# --- IDE ---
+.vscode/
+.idea/
