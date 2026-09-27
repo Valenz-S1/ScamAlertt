@@ -1,32 +1,24 @@
 """
-Servicio encargado de enviar el mensaje sospechoso a la API de Claude
-y devolver una clasificación de riesgo (bajo, medio, alto).
+Servicio de Claude API — STUB
+
+Por ahora solo devuelve un placeholder.
+Cuando se integre la API de Claude, este servicio enviará el texto
+a Anthropic y devolverá el análisis con IA.
 """
 
-from anthropic import Anthropic
-from app.core.config import settings
 
-client = Anthropic(api_key=settings.anthropic_api_key)
-
-SYSTEM_PROMPT = (
-    "Eres un asistente que detecta estafas digitales. "
-    "Analiza el siguiente mensaje y responde SOLO en JSON con las claves: "
-    "'es_sospechoso' (bool), 'tipo_estafa' (string), "
-    "'nivel_riesgo' ('bajo' | 'medio' | 'alto'), 'explicacion' (string)."
-)
-
-
-def analizar_mensaje(texto: str) -> dict:
-    response = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=500,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": texto}],
-    )
-
-    # El contenido puede tener uno o varios bloques; se une el texto
-    raw_text = "".join(
-        block.text for block in response.content if block.type == "text"
-    )
-
-    return {"raw": raw_text}
+def analyze_with_claude(text: str) -> dict:
+    """
+    Stub: análisis con Claude API.
+    TODO: Implementar llamada real a la API de Anthropic.
+    
+    Args:
+        text: Texto del mensaje a analizar.
+    
+    Returns:
+        Diccionario con resultado del análisis IA.
+    """
+    return {
+        "claude_analysis": None,
+        "message": "Claude API no integrada aún. Usando solo reglas.",
+    }
