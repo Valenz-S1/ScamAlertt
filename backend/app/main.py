@@ -1,26 +1,21 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(
-    title="ScamAlert API",
-    description="API para detección y prevención de estafas digitales",
-    version="0.1.0",
-)
+from app.core.config import settings
+from app.db.database import engine, Base
+from app.models import User, Analysis, Report  # noqa: F401
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # restringir en producción
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION)
+
+
+@app.get("/")
+def root():
+    return {
+        "project": settings.PROJECT_NAME,
+        "version": settings.VERSION,
+        "status": "running",
+    }
 
 
 @app.get("/health")
-def health_check():
+def health():
     return {"status": "ok"}
-
-
-# Aquí se incluirán los routers, por ejemplo:
-# from app.api import analyze
-# app.include_router(analyze.router, prefix="/analyze", tags=["analyze"])
