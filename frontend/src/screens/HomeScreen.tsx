@@ -9,9 +9,9 @@ import {
   Image,
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { getHistory } from "../services/api";
+import { getHistory, getStats, getProfile } from "../services/api";
 import { COLORS, RISK_CONFIG, RiskLevel } from "../theme/colors";
-import type { Analysis } from "../types";
+import type { Analysis, AnalysisStats } from "../types";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type MainStackParamList = {
@@ -28,26 +28,39 @@ export default function HomeScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
 
   const [recent, setRecent] = useState<Analysis[]>([]);
+  const [stats, setStats] = useState<AnalysisStats | null>(null);
+  const [userName, setUserName] = useState("");
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const loadHome = () => {
     getHistory(0, 3)
       .then(setRecent)
+      .catch(() => {});
+    getStats()
+      .then(setStats)
+      .catch(() => {});
+    getProfile()
+      .then((u) => setUserName(u.full_name.split(" ")[0]))
       .catch(() => {})
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadHome();
   }, []);
 
-  // Foco al volver a esta pantalla
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      getHistory(0, 3)
-        .then(setRecent)
-        .catch(() => {});
-    });
-    return unsubscribe;
+    const unsub = navigation.addListener("focus", loadHome);
+    return unsub;
   }, [navigation]);
 
-  const totalAnalyzed = recent.length;
+  // Estado general según TODO el historial (no solo lo visible)
+  const state =
+    stats && stats.danger > 0
+      ? { icon: "⚠", color: COLORS.red, label: "Con peligro" }
+      : stats && stats.suspicious > 0
+        ? { icon: "⚠", color: COLORS.yellow, label: "Sospechoso" }
+        : { icon: "✓", color: COLORS.green, label: "Seguro" };
 
   return (
     <View style={styles.safeArea}>
@@ -68,7 +81,9 @@ export default function HomeScreen({ navigation }: Props) {
             <Text style={styles.brandName}>ScamAlert</Text>
           </View>
 
-          <Text style={styles.greeting}>Bienvenido 👋</Text>
+          <Text style={styles.greeting}>
+            {userName ? `Hola, ${userName} 👋` : "Bienvenido 👋"}
+          </Text>
           <Text style={styles.headline}>¿Recibiste un mensaje sospechoso?</Text>
 
           <Pressable
@@ -83,22 +98,14 @@ export default function HomeScreen({ navigation }: Props) {
         {/* Tarjetas de estadísticas */}
         <View style={styles.statsRow}>
           <StatCard
-            value={String(totalAnalyzed)}
+            value={String(stats?.total ?? 0)}
             label="Tus análisis"
             valueColor={COLORS.base}
           />
           <StatCard
-            value={
-              recent.filter((a) => a.risk_level === "red").length > 0
-                ? "⚠"
-                : "✓"
-            }
-            label="Estado"
-            valueColor={
-              recent.some((a) => a.risk_level === "red")
-                ? COLORS.red
-                : COLORS.green
-            }
+            value={state.icon}
+            label={state.label}
+            valueColor={state.color}
           />
           <StatCard value="24/7" label="Disponible" valueColor={COLORS.base} />
         </View>

@@ -48,3 +48,10 @@ export interface Report {
   is_confirmed_scam: boolean | null;
   created_at: string;
 }
+
+export interface AnalysisStats {
+  total: number;
+  safe: number;
+  suspicious: number;
+  danger: number;
+}

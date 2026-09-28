@@ -13,6 +13,7 @@ from app.schemas.analysis import AnalysisOut
 from app.services.analysis_service import analyze_message
 from app.services.ocr_service import extract_text_from_image
 from app.services.claude_service import analyze_with_claude
+from sqlalchemy import func  # ← agrega al import existente de sqlalchemy.orm
 
 router = APIRouter(prefix="/analysis", tags=["Análisis"])
 
@@ -140,6 +141,29 @@ def get_analysis_history(
         .all()
     )
     return analyses
+
+
+
+# ── ESTADÍSTICAS DEL USUARIO (total histórico) ──
+@router.get("/stats")
+def get_analysis_stats(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Total histórico de análisis del usuario, por nivel de riesgo."""
+    rows = (
+        db.query(Analysis.risk_level, func.count(Analysis.id))
+        .filter(Analysis.user_id == current_user.id)
+        .group_by(Analysis.risk_level)
+        .all()
+    )
+    counts = {level: count for level, count in rows}
+    return {
+        "total": sum(counts.values()),
+        "safe": counts.get("green", 0),
+        "suspicious": counts.get("yellow", 0),
+        "danger": counts.get("red", 0),
+    }
 
 
 # ── OBTENER UN ANÁLISIS ESPECÍFICO ──

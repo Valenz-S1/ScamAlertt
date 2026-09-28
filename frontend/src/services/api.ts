@@ -1,8 +1,14 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { User, LoginResponse, Analysis, Report } from "../types";
+import type {
+  User,
+  LoginResponse,
+  Analysis,
+  Report,
+  AnalysisStats,
+} from "../types";
 
-const API_BASE = "http://10.0.2.2:8000"; // Android emulator
+export const API_BASE = "http://10.0.2.2:8000"; // Android emulator
 // Si usas dispositivo físico, cámbialo a tu IP local:
 // const API_BASE = "http://192.168.x.x:8000";
 
@@ -103,6 +109,11 @@ export async function getHistory(
 
 export async function getAnalysis(id: string): Promise<Analysis> {
   const res = await api.get<Analysis>(`/analysis/${id}`);
+  return res.data;
+}
+
+export async function getStats(): Promise<AnalysisStats> {
+  const res = await api.get<AnalysisStats>("/analysis/stats");
   return res.data;
 }
 
