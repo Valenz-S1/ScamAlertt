@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  TextInput,
   Pressable,
   StyleSheet,
   Alert,
@@ -14,10 +13,14 @@ import {
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { changePassword } from "../services/api";
 import { COLORS } from "../theme/colors";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import PasswordInput from "../components/PasswordInput";
 
 type Props = NativeStackScreenProps<any, any>;
 
 export default function ChangePasswordScreen({ navigation }: Props) {
+  const insets = useSafeAreaInsets();
+
   const [current, setCurrent] = useState("");
   const [newPass, setNewPass] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -65,7 +68,7 @@ export default function ChangePasswordScreen({ navigation }: Props) {
           keyboardShouldPersistTaps="handled"
         >
           {/* Encabezado */}
-          <View style={styles.header}>
+          <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
             <Pressable
               style={styles.backButton}
               onPress={() => navigation.goBack()}
@@ -77,30 +80,34 @@ export default function ChangePasswordScreen({ navigation }: Props) {
 
           <View style={styles.form}>
             <Text style={styles.label}>CONTRASEÑA ACTUAL</Text>
-            <TextInput
-              style={styles.input}
+            <PasswordInput
               value={current}
               onChangeText={setCurrent}
-              secureTextEntry
               placeholderTextColor={COLORS.textMuted}
             />
 
             <Text style={styles.label}>NUEVA CONTRASEÑA</Text>
-            <TextInput
-              style={styles.input}
+            <PasswordInput
               value={newPass}
               onChangeText={setNewPass}
-              secureTextEntry
               placeholderTextColor={COLORS.textMuted}
+              error={
+                newPass.length > 0 && newPass.length < 8
+                  ? "Mínimo 8 caracteres"
+                  : null
+              }
             />
 
             <Text style={styles.label}>CONFIRMAR NUEVA CONTRASEÑA</Text>
-            <TextInput
-              style={styles.input}
+            <PasswordInput
               value={confirm}
               onChangeText={setConfirm}
-              secureTextEntry
               placeholderTextColor={COLORS.textMuted}
+              error={
+                confirm && confirm !== newPass
+                  ? "Las contraseñas no coinciden"
+                  : null
+              }
             />
 
             <Pressable
