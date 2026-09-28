@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Image,
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { login } from "../services/api";
@@ -35,12 +36,20 @@ export default function LoginScreen({ navigation }: Props) {
       Alert.alert("Error", "Ingresa email y contraseña");
       return;
     }
+
     setLoading(true);
+
     try {
-      await login(email, password);
+      await login(email.trim(), password);
     } catch (err: any) {
-      const msg = err?.response?.data?.detail || "No se pudo iniciar sesión";
-      Alert.alert("Error", msg);
+      Alert.alert(
+        "Error",
+        err?.response?.data?.detail || "No se pudo iniciar sesión",
+      );
+
+      // Credenciales incorrectas: vaciar ambos campos
+      setEmail("");
+      setPassword("");
     } finally {
       setLoading(false);
     }
@@ -58,9 +67,14 @@ export default function LoginScreen({ navigation }: Props) {
         {/* Encabezado morado */}
         <View style={[styles.header, { paddingTop: insets.top + 48 }]}>
           <View style={styles.logoBox}>
-            <Text style={styles.logoIcon}>🛡️</Text>
+            <Image
+              source={require("../../assets/icon.png")}
+              style={styles.logoImage}
+            />
           </View>
+
           <Text style={styles.brandName}>ScamAlert</Text>
+
           <Text style={styles.tagline}>
             Detecta estafas digitales antes de que sea tarde
           </Text>
@@ -102,6 +116,7 @@ export default function LoginScreen({ navigation }: Props) {
 
           <View style={styles.footerRow}>
             <Text style={styles.footerText}>¿No tienes cuenta?</Text>
+
             <Pressable onPress={() => navigation.navigate("Register")}>
               <Text style={styles.footerLink}> Regístrate</Text>
             </Pressable>
@@ -113,8 +128,14 @@ export default function LoginScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg },
-  scrollContent: { paddingBottom: 40 },
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.bg,
+  },
+
+  scrollContent: {
+    paddingBottom: 40,
+  },
 
   header: {
     backgroundColor: COLORS.base,
@@ -125,17 +146,26 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 28,
     alignItems: "center",
   },
+
   logoBox: {
     width: 56,
     height: 56,
     borderRadius: 16,
-    backgroundColor: "#FF6B4A",
-    alignItems: "center",
-    justifyContent: "center",
+    overflow: "hidden",
     marginBottom: 12,
   },
-  logoIcon: { fontSize: 28 },
-  brandName: { color: COLORS.white, fontSize: 28, fontWeight: "700" },
+
+  logoImage: {
+    width: 56,
+    height: 56,
+  },
+
+  brandName: {
+    color: COLORS.white,
+    fontSize: 28,
+    fontWeight: "700",
+  },
+
   tagline: {
     color: COLORS.headerTint,
     fontSize: 14,
@@ -143,13 +173,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  form: { paddingHorizontal: 24, paddingTop: 32 },
+  form: {
+    paddingHorizontal: 24,
+    paddingTop: 32,
+  },
+
   sectionTitle: {
     fontSize: 22,
     fontWeight: "700",
     color: COLORS.text,
     marginBottom: 24,
   },
+
   label: {
     fontSize: 12,
     fontWeight: "700",
@@ -158,6 +193,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginTop: 16,
   },
+
   input: {
     backgroundColor: COLORS.card,
     borderRadius: 12,
@@ -176,7 +212,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 28,
   },
-  buttonDisabled: { opacity: 0.6 },
+
+  buttonDisabled: {
+    opacity: 0.6,
+  },
+
   mainButtonText: {
     color: COLORS.white,
     fontSize: 16,
@@ -188,6 +228,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 20,
   },
-  footerText: { fontSize: 14, color: COLORS.textMuted },
-  footerLink: { fontSize: 14, color: COLORS.base, fontWeight: "700" },
+
+  footerText: {
+    fontSize: 14,
+    color: COLORS.textMuted,
+  },
+
+  footerLink: {
+    fontSize: 14,
+    color: COLORS.base,
+    fontWeight: "700",
+  },
 });
