@@ -2,17 +2,20 @@
   "expo": {
     "name": "ScamAlert",
     "slug": "scamalert",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "backgroundColor": "#ffffff"
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#2A1B6D"
     },
+    "ios": { "supportsTablet": false, "bundleIdentifier": "com.scamalert.app" },
     "android": {
+      "adaptiveIcon": { "backgroundColor": "#2A1B6D" },
       "package": "com.scamalert.app"
     },
-    "ios": {
-      "bundleIdentifier": "com.scamalert.app"
-    }
+    "plugins": ["expo-image-picker"]
   }
 }
