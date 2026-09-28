@@ -31,6 +31,24 @@ import { COLORS } from "../theme/colors";
 
 type Props = NativeStackScreenProps<any, any>;
 
+// Traduce errores de FastAPI (incluye 422 que manda un array, no un string)
+function getErrMsg(err: any): string {
+  const d = err?.response?.data?.detail;
+
+  if (typeof d === "string") return d;
+
+  if (Array.isArray(d)) {
+    return d
+      .map(
+        (e: any) =>
+          (e.msg || "").replace("Value error, ", "") || JSON.stringify(e),
+      )
+      .join("\n");
+  }
+
+  return "No se pudo guardar. Verifica tu conexión.";
+}
+
 export default function ProfileScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
@@ -39,7 +57,7 @@ export default function ProfileScreen({ navigation }: Props) {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [age, setAge] = useState<number | null>(null);
-  const [avatarLocal, setAvatarLocal] = useState<string | null>(null); // preview antes de guardar
+  const [avatarLocal, setAvatarLocal] = useState<string | null>(null);
   const [avatarRemote, setAvatarRemote] = useState<string | null>(null);
   const [errors, setErrors] = useState<{
     name?: string;
@@ -66,17 +84,22 @@ export default function ProfileScreen({ navigation }: Props) {
 
   const pickAvatar = async () => {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
     if (!perm.granted) {
       Alert.alert("Permiso requerido", "Se necesita acceso a tus imágenes");
       return;
     }
+
     const picked = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.7,
     });
-    if (!picked.canceled) setAvatarLocal(picked.assets[0].uri);
+
+    if (!picked.canceled) {
+      setAvatarLocal(picked.assets[0].uri);
+    }
   };
 
   const handleSave = async () => {
@@ -85,25 +108,41 @@ export default function ProfileScreen({ navigation }: Props) {
       email: validateEmail(email),
       phone: validatePhone(phone),
     };
+
     setErrors(next);
+
     if (Object.values(next).some(Boolean)) {
       Alert.alert("Error", "Revisa los campos marcados en rojo");
       return;
     }
 
     setSaving(true);
+
     try {
-      if (avatarLocal) await uploadAvatar(avatarLocal);
+      // 1º los datos (lo esencial — nunca lo bloquea la foto)
       await updateProfile({
         email: email.trim(),
         full_name: fullName.trim(),
         phone: phone || undefined,
         age_range: age !== null ? String(age) : undefined,
       });
+
+      // 2º la foto, por separado: si falla, avisa pero NO deshace los datos
+      if (avatarLocal) {
+        try {
+          await uploadAvatar(avatarLocal);
+        } catch {
+          Alert.alert(
+            "Aviso",
+            "Los datos se guardaron, pero la foto no pudo actualizarse.",
+          );
+        }
+      }
+
       Alert.alert("Éxito", "Perfil actualizado");
-      navigation.goBack(); // Settings refresca solo (listener de focus)
+      navigation.goBack(); // Settings y Home refrescan solos (listener de focus)
     } catch (err: any) {
-      Alert.alert("Error", err?.response?.data?.detail || "No se pudo guardar");
+      Alert.alert("Error", getErrMsg(err));
     } finally {
       setSaving(false);
     }
@@ -137,6 +176,7 @@ export default function ProfileScreen({ navigation }: Props) {
           >
             <Text style={styles.backText}>← Volver</Text>
           </Pressable>
+
           <Text style={styles.title}>Mi perfil</Text>
         </View>
 
@@ -152,10 +192,12 @@ export default function ProfileScreen({ navigation }: Props) {
                 </Text>
               </View>
             )}
+
             <View style={styles.cameraBadge}>
               <Text style={styles.cameraIcon}>📷</Text>
             </View>
           </Pressable>
+
           <Text style={styles.avatarHint}>Toca la foto para cambiarla</Text>
 
           <Text style={styles.label}>NOMBRE COMPLETO</Text>
@@ -164,10 +206,14 @@ export default function ProfileScreen({ navigation }: Props) {
             value={fullName}
             onChangeText={(t) => {
               setFullName(t);
-              setErrors((p) => ({ ...p, name: validateName(t) }));
+              setErrors((p) => ({
+                ...p,
+                name: validateName(t),
+              }));
             }}
             placeholderTextColor={COLORS.textMuted}
           />
+
           {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
           <Text style={styles.label}>CORREO ELECTRÓNICO</Text>
@@ -176,13 +222,17 @@ export default function ProfileScreen({ navigation }: Props) {
             value={email}
             onChangeText={(t) => {
               setEmail(t);
-              setErrors((p) => ({ ...p, email: validateEmail(t) }));
+              setErrors((p) => ({
+                ...p,
+                email: validateEmail(t),
+              }));
             }}
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
             placeholderTextColor={COLORS.textMuted}
           />
+
           {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
           <Text style={styles.label}>TELÉFONO</Text>
@@ -191,13 +241,19 @@ export default function ProfileScreen({ navigation }: Props) {
             value={phone}
             onChangeText={(t) => {
               const clean = t.replace(/\D/g, "").slice(0, 10);
+
               setPhone(clean);
-              setErrors((p) => ({ ...p, phone: validatePhone(clean) }));
+
+              setErrors((p) => ({
+                ...p,
+                phone: validatePhone(clean),
+              }));
             }}
             keyboardType="phone-pad"
             placeholder="5512345678"
             placeholderTextColor={COLORS.textMuted}
           />
+
           {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
 
           <Text style={styles.label}>EDAD</Text>
@@ -219,8 +275,15 @@ export default function ProfileScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg },
-  scrollContent: { paddingBottom: 40 },
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.bg,
+  },
+
+  scrollContent: {
+    paddingBottom: 40,
+  },
+
   centered: {
     flex: 1,
     justifyContent: "center",
@@ -233,6 +296,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 28,
   },
+
   backButton: {
     alignSelf: "flex-start",
     backgroundColor: "rgba(255,255,255,0.12)",
@@ -241,11 +305,29 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 16,
   },
-  backText: { color: COLORS.white, fontSize: 13, fontWeight: "600" },
-  title: { color: COLORS.white, fontSize: 24, fontWeight: "700" },
 
-  form: { paddingHorizontal: 24, paddingTop: 8 },
-  avatarWrap: { alignSelf: "center", marginTop: -44 },
+  backText: {
+    color: COLORS.white,
+    fontSize: 13,
+    fontWeight: "600",
+  },
+
+  title: {
+    color: COLORS.white,
+    fontSize: 24,
+    fontWeight: "700",
+  },
+
+  form: {
+    paddingHorizontal: 24,
+    paddingTop: 8,
+  },
+
+  avatarWrap: {
+    alignSelf: "center",
+    marginTop: -44,
+  },
+
   avatar: {
     width: 96,
     height: 96,
@@ -253,6 +335,7 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: COLORS.white,
   },
+
   avatarPlaceholder: {
     width: 96,
     height: 96,
@@ -263,7 +346,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  avatarInitial: { fontSize: 36, fontWeight: "700", color: COLORS.base },
+
+  avatarInitial: {
+    fontSize: 36,
+    fontWeight: "700",
+    color: COLORS.base,
+  },
+
   cameraBadge: {
     position: "absolute",
     right: -2,
@@ -277,7 +366,11 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: COLORS.white,
   },
-  cameraIcon: { fontSize: 13 },
+
+  cameraIcon: {
+    fontSize: 13,
+  },
+
   avatarHint: {
     textAlign: "center",
     fontSize: 11,
@@ -293,6 +386,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginTop: 16,
   },
+
   input: {
     backgroundColor: COLORS.card,
     borderRadius: 12,
@@ -303,7 +397,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: COLORS.text,
   },
-  inputError: { borderColor: COLORS.red },
+
+  inputError: {
+    borderColor: COLORS.red,
+  },
+
   errorText: {
     color: COLORS.red,
     fontSize: 12,
@@ -318,6 +416,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 28,
   },
-  buttonDisabled: { opacity: 0.6 },
-  saveButtonText: { color: COLORS.white, fontSize: 16, fontWeight: "700" },
+
+  buttonDisabled: {
+    opacity: 0.6,
+  },
+
+  saveButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: "700",
+  },
 });

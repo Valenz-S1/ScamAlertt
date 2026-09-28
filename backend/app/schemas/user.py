@@ -21,6 +21,7 @@ class UserLogin(BaseModel):
 
 # ── Actualizar perfil ──
 class UserUpdate(BaseModel):
+    email: EmailStr | None = None
     full_name: str | None = None
     phone: str | None = None
     age_range: str | None = None
@@ -39,6 +40,7 @@ class UserOut(BaseModel):
     full_name: str
     phone: str | None
     age_range: str | None
+    avatar_url: str | None = None
     is_active: bool
     created_at: datetime
     updated_at: datetime
