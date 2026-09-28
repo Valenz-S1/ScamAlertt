@@ -7,11 +7,13 @@ import {
   ScrollView,
   SafeAreaView,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { getHistory } from "../services/api";
 import { COLORS, RISK_CONFIG, RiskLevel } from "../theme/colors";
 import type { Analysis } from "../types";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type MainStackParamList = {
   Home: undefined;
@@ -24,6 +26,8 @@ type MainStackParamList = {
 type Props = NativeStackScreenProps<MainStackParamList, "Home">;
 
 export default function HomeScreen({ navigation }: Props) {
+  const insets = useSafeAreaInsets();
+
   const [recent, setRecent] = useState<Analysis[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -54,10 +58,13 @@ export default function HomeScreen({ navigation }: Props) {
         showsVerticalScrollIndicator={false}
       >
         {/* Encabezado morado */}
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: 16 + insets.top }]}>
           <View style={styles.brandRow}>
             <View style={styles.logoBox}>
-              <Text style={styles.logoIcon}>🛡️</Text>
+              <Image
+                source={require("../../assets/icon.png")}
+                style={styles.logoImage}
+              />
             </View>
             <Text style={styles.brandName}>ScamAlert</Text>
           </View>
@@ -127,6 +134,7 @@ export default function HomeScreen({ navigation }: Props) {
       {/* Barra inferior */}
       <TabBar
         active="Home"
+        bottomInset={insets.bottom}
         onNavigate={(screen) => navigation.navigate(screen as any)}
       />
     </SafeAreaView>
@@ -186,9 +194,11 @@ function AnalysisRow({ item }: { item: Analysis }) {
 // Barra de navegación inferior
 function TabBar({
   active,
+  bottomInset = 0,
   onNavigate,
 }: {
   active: string;
+  bottomInset?: number;
   onNavigate: (screen: string) => void;
 }) {
   const tabs = [
@@ -199,7 +209,7 @@ function TabBar({
   ];
 
   return (
-    <View style={styles.tabBar}>
+    <View style={[styles.tabBar, { paddingBottom: 16 + bottomInset }]}>
       {tabs.map((tab) => {
         const isActive = active === tab.key;
         const color = isActive ? COLORS.base : COLORS.textMuted;
@@ -247,6 +257,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 10,
   },
+  logoImage: { width: 40, height: 40, borderRadius: 12 },
   logoIcon: { fontSize: 20 },
   brandName: { color: COLORS.white, fontSize: 20, fontWeight: "700" },
   greeting: { color: COLORS.headerTint, fontSize: 16, marginBottom: 6 },
