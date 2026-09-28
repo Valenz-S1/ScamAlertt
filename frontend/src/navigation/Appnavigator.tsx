@@ -24,7 +24,7 @@ export type AuthStackParamList = {
 export type MainStackParamList = {
   Home: undefined;
   Analyze: undefined;
-  Result: { result: Analysis };
+  Result: { result: Analysis; fromHistory?: boolean };
   History: undefined;
   Settings: undefined;
   Profile: undefined;
@@ -44,6 +44,7 @@ export default function AppNavigator() {
       const token = await AsyncStorage.getItem("token");
       setIsLoggedIn(!!token);
     };
+
     check();
   }, []);
 
@@ -52,11 +53,13 @@ export default function AppNavigator() {
     const interval = setInterval(async () => {
       const token = await AsyncStorage.getItem("token");
       const loggedIn = !!token;
+
       setIsLoggedIn((prev) => {
         if (prev !== loggedIn) return loggedIn;
         return prev;
       });
     }, 1000);
+
     return () => clearInterval(interval);
   }, []);
 

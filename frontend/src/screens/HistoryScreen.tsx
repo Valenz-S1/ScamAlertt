@@ -16,6 +16,7 @@ import type { Analysis } from "../types";
 type MainStackParamList = {
   Home: undefined;
   Analyze: undefined;
+  Result: { result: Analysis; fromHistory?: boolean };
   History: undefined;
   Settings: undefined;
 };
@@ -101,7 +102,17 @@ export default function HistoryScreen({ navigation }: Props) {
         contentContainerStyle={styles.list}
         data={filteredItems}
         keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => <HistoryRow item={item} />}
+        renderItem={({ item }) => (
+          <HistoryRow
+            item={item}
+            onPress={() =>
+              navigation.navigate("Result", {
+                result: item,
+                fromHistory: true,
+              })
+            }
+          />
+        )}
         ListEmptyComponent={
           <Text style={styles.empty}>
             {filter === "all"
@@ -134,7 +145,13 @@ export default function HistoryScreen({ navigation }: Props) {
   );
 }
 
-function HistoryRow({ item }: { item: Analysis }) {
+function HistoryRow({
+  item,
+  onPress,
+}: {
+  item: Analysis;
+  onPress: () => void;
+}) {
   const risk = item.risk_level as RiskLevel;
   const config = RISK_CONFIG[risk];
   const date = new Date(item.created_at).toLocaleString("es-ES", {
@@ -145,7 +162,7 @@ function HistoryRow({ item }: { item: Analysis }) {
   });
 
   return (
-    <View style={styles.row}>
+    <Pressable style={styles.row} onPress={onPress}>
       <View style={[styles.rowIconBox, { backgroundColor: config.bg }]}>
         <Text style={styles.rowIcon}>{config.icon}</Text>
       </View>
@@ -166,7 +183,7 @@ function HistoryRow({ item }: { item: Analysis }) {
         </Text>
         <Text style={styles.rowDate}>{date}</Text>
       </View>
-    </View>
+    </Pressable>
   );
 }
 
