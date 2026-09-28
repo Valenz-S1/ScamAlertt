@@ -13,6 +13,8 @@ import {
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { login } from "../services/api";
 import { COLORS } from "../theme/colors";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import PasswordInput from "../components/PasswordInput";
 
 type AuthStackParamList = {
   Login: undefined;
@@ -22,6 +24,8 @@ type AuthStackParamList = {
 type Props = NativeStackScreenProps<AuthStackParamList, "Login">;
 
 export default function LoginScreen({ navigation }: Props) {
+  const insets = useSafeAreaInsets();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -52,7 +56,7 @@ export default function LoginScreen({ navigation }: Props) {
         keyboardShouldPersistTaps="handled"
       >
         {/* Encabezado morado */}
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 48 }]}>
           <View style={styles.logoBox}>
             <Text style={styles.logoIcon}>🛡️</Text>
           </View>
@@ -79,13 +83,11 @@ export default function LoginScreen({ navigation }: Props) {
           />
 
           <Text style={styles.label}>CONTRASEÑA</Text>
-          <TextInput
-            style={styles.input}
+          <PasswordInput
             value={password}
             onChangeText={setPassword}
             placeholder="••••••••"
             placeholderTextColor={COLORS.textMuted}
-            secureTextEntry
           />
 
           <Pressable
