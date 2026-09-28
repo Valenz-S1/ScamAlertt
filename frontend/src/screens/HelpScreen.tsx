@@ -1,13 +1,7 @@
 import React from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-} from "react-native";
+import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { COLORS } from "../theme/colors";
 
 type Props = NativeStackScreenProps<any, any>;
@@ -64,11 +58,13 @@ const TIPS = [
 ];
 
 export default function HelpScreen({ navigation }: Props) {
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Encabezado morado */}
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: 12 + insets.top }]}>
           <Pressable
             style={styles.backButton}
             onPress={() => navigation.goBack()}
@@ -104,7 +100,7 @@ export default function HelpScreen({ navigation }: Props) {
           </Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

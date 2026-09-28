@@ -1,13 +1,7 @@
 import React from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-} from "react-native";
+import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import RiskBadge from "../components/RiskBadge";
 import { COLORS, RISK_CONFIG, RiskLevel } from "../theme/colors";
 import type { Analysis } from "../types";
@@ -21,18 +15,27 @@ type MainStackParamList = {
 type Props = NativeStackScreenProps<MainStackParamList, "Result">;
 
 export default function ResultScreen({ route, navigation }: Props) {
+  const insets = useSafeAreaInsets();
   const { result } = route.params;
   const risk = result.risk_level as RiskLevel;
   const config = RISK_CONFIG[risk];
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.scrollContent}
       >
         {/* Encabezado con color según riesgo */}
-        <View style={[styles.header, { backgroundColor: config.bg }]}>
+        <View
+          style={[
+            styles.header,
+            {
+              backgroundColor: config.bg,
+              paddingTop: 12 + insets.top,
+            },
+          ]}
+        >
           <Pressable
             style={styles.backButton}
             onPress={() => navigation.goBack()}
@@ -98,7 +101,7 @@ export default function ResultScreen({ route, navigation }: Props) {
           </Pressable>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

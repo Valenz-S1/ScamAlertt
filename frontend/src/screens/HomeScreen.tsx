@@ -5,7 +5,6 @@ import {
   Pressable,
   StyleSheet,
   ScrollView,
-  SafeAreaView,
   ActivityIndicator,
   Image,
 } from "react-native";
@@ -51,7 +50,7 @@ export default function HomeScreen({ navigation }: Props) {
   const totalAnalyzed = recent.length;
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.scrollContent}
@@ -137,7 +136,7 @@ export default function HomeScreen({ navigation }: Props) {
         bottomInset={insets.bottom}
         onNavigate={(screen) => navigation.navigate(screen as any)}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 

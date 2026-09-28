@@ -6,8 +6,8 @@ import {
   Pressable,
   StyleSheet,
   ActivityIndicator,
-  SafeAreaView,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { getHistory } from "../services/api";
 import { COLORS, RISK_CONFIG, RiskLevel } from "../theme/colors";
@@ -32,6 +32,7 @@ const FILTERS: { key: FilterOption; label: string; icon?: string }[] = [
 ];
 
 export default function HistoryScreen({ navigation }: Props) {
+  const insets = useSafeAreaInsets();
   const [items, setItems] = useState<Analysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterOption>("all");
@@ -59,16 +60,16 @@ export default function HistoryScreen({ navigation }: Props) {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.centered}>
+      <View style={styles.centered}>
         <ActivityIndicator size="large" color={COLORS.base} />
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       {/* Encabezado morado */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: 16 + insets.top }]}>
         <Text style={styles.title}>Historial</Text>
         <Text style={styles.subtitle}>{items.length} análisis realizados</Text>
       </View>
@@ -111,7 +112,7 @@ export default function HistoryScreen({ navigation }: Props) {
       />
 
       {/* Barra inferior */}
-      <View style={styles.tabBar}>
+      <View style={[styles.tabBar, { paddingBottom: 16 + insets.bottom }]}>
         <TabItem
           icon="🏠"
           label="Inicio"
@@ -129,7 +130,7 @@ export default function HistoryScreen({ navigation }: Props) {
           onPress={() => navigation.navigate("Settings")}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

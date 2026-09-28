@@ -4,11 +4,11 @@ import {
   Text,
   Pressable,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   Alert,
   ActivityIndicator,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { getProfile, logout } from "../services/api";
 import { COLORS } from "../theme/colors";
@@ -26,6 +26,7 @@ type MainStackParamList = {
 type Props = NativeStackScreenProps<MainStackParamList, "Settings">;
 
 export default function SettingsScreen({ navigation }: Props) {
+  const insets = useSafeAreaInsets();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -59,10 +60,10 @@ export default function SettingsScreen({ navigation }: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Encabezado morado */}
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: 16 + insets.top }]}>
           <Text style={styles.title}>Ajustes</Text>
           <Text style={styles.subtitle}>Tu cuenta y preferencias</Text>
         </View>
@@ -117,7 +118,7 @@ export default function SettingsScreen({ navigation }: Props) {
       </ScrollView>
 
       {/* Barra inferior */}
-      <View style={styles.tabBar}>
+      <View style={[styles.tabBar, { paddingBottom: 16 + insets.bottom }]}>
         <TabItem
           icon="🏠"
           label="Inicio"
@@ -135,7 +136,7 @@ export default function SettingsScreen({ navigation }: Props) {
         />
         <TabItem icon="⚙️" label="Ajustes" active />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
