@@ -113,9 +113,15 @@ export async function analyzeImage(uri: string): Promise<Analysis> {
 export async function getHistory(
   skip: number = 0,
   limit: number = 20,
+  opts?: { riskLevel?: string; date?: string },
 ): Promise<Analysis[]> {
   const res = await api.get<Analysis[]>("/analysis/history", {
-    params: { skip, limit },
+    params: {
+      skip,
+      limit,
+      ...(opts?.riskLevel ? { risk_level: opts.riskLevel } : {}),
+      ...(opts?.date ? { date: opts.date } : {}),
+    },
   });
   return res.data;
 }

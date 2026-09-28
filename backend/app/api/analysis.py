@@ -1,9 +1,11 @@
 import os
 import uuid
+from datetime import date as date_type
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query
 from sqlalchemy.orm import Session
 from typing import Optional
+from sqlalchemy import func
 
 from app.core.deps import get_current_user
 from app.db.database import get_db
@@ -13,7 +15,6 @@ from app.schemas.analysis import AnalysisOut
 from app.services.analysis_service import analyze_message
 from app.services.ocr_service import extract_text_from_image
 from app.services.claude_service import analyze_with_claude
-from sqlalchemy import func  # ← agrega al import existente de sqlalchemy.orm
 
 router = APIRouter(prefix="/analysis", tags=["Análisis"])
 
@@ -64,7 +65,14 @@ async def analyze_image(
 ):
     """Recibe una imagen, extrae texto con OCR y lo analiza."""
     # Validar que sea una imagen
-    allowed_types = {"image/jpeg", "image/png", "image/jpg", "image/webp", "image/bmp"}
+    allowed_types = {
+        "image/jpeg",
+        "image/png",
+        "image/jpg",
+        "image/webp",
+        "image/bmp",
+    }
+
     if file.content_type not in allowed_types:
         raise HTTPException(
             status_code=400,
@@ -103,6 +111,7 @@ async def analyze_image(
 
     # Guardar análisis en la BD
     image_url = f"/uploads/{unique_filename}"
+
     analysis = Analysis(
         user_id=current_user.id,
         input_type="image",
@@ -117,31 +126,45 @@ async def analyze_image(
         detected_rules=result["detected_rules"],
         similar_reports_count=result["similar_reports_count"],
     )
+
     db.add(analysis)
     db.commit()
     db.refresh(analysis)
     return analysis
 
 
-# ── HISTORIAL DE ANÁLISIS DEL USUARIO ──
+# ── HISTORIAL DE ANÁLISIS DEL USUARIO (con filtros) ──
 @router.get("/history", response_model=list[AnalysisOut])
 def get_analysis_history(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
+    risk_level: Optional[str] = Query(
+        None,
+        pattern="^(green|yellow|red)$",
+    ),
+    date: Optional[date_type] = Query(None),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Devuelve el historial de análisis del usuario actual."""
+    """Historial del usuario. Filtros opcionales: nivel de riesgo y fecha (YYYY-MM-DD)."""
+    q = db.query(Analysis).filter(
+        Analysis.user_id == current_user.id
+    )
+
+    if risk_level:
+        q = q.filter(Analysis.risk_level == risk_level)
+
+    if date:
+        q = q.filter(func.date(Analysis.created_at) == date)
+
     analyses = (
-        db.query(Analysis)
-        .filter(Analysis.user_id == current_user.id)
-        .order_by(Analysis.created_at.desc())
+        q.order_by(Analysis.created_at.desc())
         .offset(skip)
         .limit(limit)
         .all()
     )
-    return analyses
 
+    return analyses
 
 
 # ── ESTADÍSTICAS DEL USUARIO (total histórico) ──
@@ -157,7 +180,9 @@ def get_analysis_stats(
         .group_by(Analysis.risk_level)
         .all()
     )
+
     counts = {level: count for level, count in rows}
+
     return {
         "total": sum(counts.values()),
         "safe": counts.get("green", 0),
@@ -176,9 +201,17 @@ def get_analysis(
     """Devuelve un análisis específico del usuario."""
     analysis = (
         db.query(Analysis)
-        .filter(Analysis.id == analysis_id, Analysis.user_id == current_user.id)
+        .filter(
+            Analysis.id == analysis_id,
+            Analysis.user_id == current_user.id,
+        )
         .first()
     )
+
     if not analysis:
-        raise HTTPException(status_code=404, detail="Análisis no encontrado")
+        raise HTTPException(
+            status_code=404,
+            detail="Análisis no encontrado",
+        )
+
     return analysis
