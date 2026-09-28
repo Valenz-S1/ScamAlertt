@@ -54,11 +54,24 @@ export async function getProfile(): Promise<User> {
 }
 
 export async function updateProfile(data: {
+  email?: string;
   full_name?: string;
   phone?: string;
   age_range?: string;
 }): Promise<User> {
   const res = await api.put<User>("/auth/profile", data);
+  return res.data;
+}
+
+export async function uploadAvatar(uri: string): Promise<User> {
+  const form = new FormData();
+  const filename = uri.split("/").pop() || "avatar.jpg";
+  const match = /\.(\w+)$/.exec(filename);
+  const type = match ? `image/${match[1]}` : "image/jpeg";
+  form.append("file", { uri, name: filename, type } as any);
+  const res = await api.post<User>("/auth/avatar", form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
   return res.data;
 }
 

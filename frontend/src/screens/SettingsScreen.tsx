@@ -7,10 +7,11 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { getProfile, logout } from "../services/api";
+import { getProfile, logout, API_BASE } from "../services/api";
 import { COLORS } from "../theme/colors";
 import type { User } from "../types";
 
@@ -19,6 +20,7 @@ type MainStackParamList = {
   Analyze: undefined;
   History: undefined;
   Settings: undefined;
+  Profile: undefined;
   ChangePassword: undefined;
   Help: undefined;
 };
@@ -77,19 +79,30 @@ export default function SettingsScreen({ navigation }: Props) {
         ) : (
           <View style={styles.card}>
             {/* Datos del usuario */}
-            <View style={styles.profileRow}>
-              <View style={styles.avatar}>
-                <Text style={styles.avatarText}>
-                  {user?.full_name?.charAt(0)?.toUpperCase() || "?"}
-                </Text>
-              </View>
+            <Pressable
+              style={styles.profileRow}
+              onPress={() => navigation.navigate("Profile")}
+            >
+              {user?.avatar_url ? (
+                <Image
+                  source={{ uri: `${API_BASE}${user.avatar_url}` }}
+                  style={styles.avatar}
+                />
+              ) : (
+                <View style={styles.avatar}>
+                  <Text style={styles.avatarText}>
+                    {user?.full_name?.charAt(0)?.toUpperCase() || "?"}
+                  </Text>
+                </View>
+              )}
               <View style={styles.profileInfo}>
                 <Text style={styles.profileName}>
                   {user?.full_name || "Usuario"}
                 </Text>
                 <Text style={styles.profileEmail}>{user?.email || ""}</Text>
               </View>
-            </View>
+              <Text style={styles.chevron}>›</Text>
+            </Pressable>
 
             <View style={styles.divider} />
 
@@ -233,6 +246,7 @@ const styles = StyleSheet.create({
   profileInfo: { flex: 1 },
   profileName: { fontSize: 17, fontWeight: "700", color: COLORS.text },
   profileEmail: { fontSize: 13, color: COLORS.textMuted, marginTop: 2 },
+  chevron: { fontSize: 22, color: COLORS.textMuted },
   divider: {
     height: 1,
     backgroundColor: COLORS.border,

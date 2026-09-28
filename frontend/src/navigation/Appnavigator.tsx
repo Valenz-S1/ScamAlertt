@@ -10,6 +10,7 @@ import AnalyzeScreen from "../screens/AnalyzeScreen";
 import ResultScreen from "../screens/ResultScreen";
 import HistoryScreen from "../screens/HistoryScreen";
 import SettingsScreen from "../screens/SettingsScreen";
+import ProfileScreen from "../screens/ProfileScreen";
 import ChangePasswordScreen from "../screens/ChangePasswordScreen";
 import HelpScreen from "../screens/HelpScreen";
 import type { Analysis } from "../types";
@@ -26,6 +27,7 @@ export type MainStackParamList = {
   Result: { result: Analysis };
   History: undefined;
   Settings: undefined;
+  Profile: undefined;
   ChangePassword: undefined;
   Help: undefined;
 };
@@ -84,6 +86,7 @@ function MainStackNavigator() {
       <MainStack.Screen name="Result" component={ResultScreen} />
       <MainStack.Screen name="History" component={HistoryScreen} />
       <MainStack.Screen name="Settings" component={SettingsScreen} />
+      <MainStack.Screen name="Profile" component={ProfileScreen} />
       <MainStack.Screen
         name="ChangePassword"
         component={ChangePasswordScreen}

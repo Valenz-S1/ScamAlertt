@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,13 +9,18 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  PanResponder,
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { register, login } from "../services/api";
 import PasswordInput from "../components/PasswordInput";
+import AgeSlider from "../components/AgeSlider";
 import { COLORS } from "../theme/colors";
+import {
+  validateName,
+  validateEmail,
+  validatePhone,
+} from "../utils/validation";
 
 type AuthStackParamList = {
   Login: undefined;
@@ -25,31 +30,6 @@ type AuthStackParamList = {
 type Props = NativeStackScreenProps<AuthStackParamList, "Register">;
 
 // ── Validaciones ──
-const NAME_RE = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'.-]+$/;
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-// Dominios de correo aceptados — agrega más aquí si lo necesitan
-const EMAIL_DOMAINS = [
-  "gmail.com",
-  "googlemail.com",
-  "outlook.com",
-  "outlook.com.mx",
-  "hotmail.com",
-  "hotmail.com.mx",
-  "hotmail.es",
-  "live.com",
-  "live.com.mx",
-  "yahoo.com",
-  "yahoo.com.mx",
-  "icloud.com",
-  "me.com",
-  "aol.com",
-  "proton.me",
-  "protonmail.com",
-  "terra.com.mx",
-  "prodigy.net.mx",
-];
-
 type FieldErrors = {
   name?: string;
   email?: string;
@@ -58,181 +38,11 @@ type FieldErrors = {
   confirm?: string;
 };
 
-function validateName(v: string): string | undefined {
-  if (!v.trim()) return "El nombre es obligatorio";
-  if (/\d/.test(v)) return "El nombre no puede contener números";
-  if (!NAME_RE.test(v.trim())) return "El nombre solo puede contener letras";
-  return undefined;
-}
-
-function validateEmail(v: string): string | undefined {
-  const t = v.trim();
-  if (!t) return "El correo es obligatorio";
-  if (!EMAIL_RE.test(t)) return "Formato inválido. Ejemplo: nombre@gmail.com";
-  const domain = t.split("@")[1]?.toLowerCase() ?? "";
-  if (!EMAIL_DOMAINS.includes(domain)) {
-    return "Dominio no permitido. Usa gmail, outlook, hotmail, yahoo, icloud...";
-  }
-  return undefined;
-}
-
-function validatePhone(v: string): string | undefined {
-  if (!v) return undefined; // es opcional
-  if (v.length !== 10) return "El teléfono debe tener 10 dígitos";
-  return undefined;
-}
-
 function validatePassword(v: string): string | undefined {
   if (!v) return "La contraseña es obligatoria";
   if (v.length < 8) return "Mínimo 8 caracteres";
   return undefined;
 }
-
-// ══════════════════════════════════════════════════════════════
-//  Selector de edad — slider horizontal 0-100
-// ══════════════════════════════════════════════════════════════
-
-function AgeSlider({
-  value,
-  onChange,
-}: {
-  value: number | null;
-  onChange: (age: number) => void;
-}) {
-  const trackRef = useRef<View | null>(null);
-  const trackInfo = useRef({ x: 0, width: 0 });
-  const [dragging, setDragging] = useState(false);
-
-  const shownValue = value ?? 0;
-  const ratio = shownValue / 100;
-
-  const applyValue = (pageX: number) => {
-    const { x, width } = trackInfo.current;
-    if (width <= 0) return;
-    const r = Math.max(0, Math.min(1, (pageX - x) / width));
-    onChange(Math.round(r * 100));
-  };
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: (evt) => {
-        setDragging(true);
-        // Medir al tocar (soporta taps que "saltan" a una posición)
-        trackRef.current?.measureInWindow((x, _y, width) => {
-          trackInfo.current = { x, width };
-          applyValue(evt.nativeEvent.pageX);
-        });
-      },
-      onPanResponderMove: (_evt, gesture) => applyValue(gesture.moveX),
-      onPanResponderRelease: () => setDragging(false),
-      onPanResponderTerminate: () => setDragging(false),
-    }),
-  ).current;
-
-  return (
-    <View style={sliderStyles.card}>
-      {/* Indicador dinámico — número exacto conforme desliza */}
-      <View style={sliderStyles.indicatorBox}>
-        <Text
-          style={[
-            sliderStyles.valueText,
-            dragging && sliderStyles.valueTextActive,
-          ]}
-        >
-          {value !== null ? value : "—"}
-        </Text>
-      </View>
-
-      {/* Barra deslizante */}
-      <View style={sliderStyles.trackWrap} {...panResponder.panHandlers}>
-        <View ref={trackRef} style={sliderStyles.track}>
-          {/* Sección activa (más oscura) */}
-          <View
-            style={[sliderStyles.trackFill, { width: `${ratio * 100}%` }]}
-          />
-          {/* Punto central deslizable */}
-          <View style={[sliderStyles.thumbBox, { left: `${ratio * 100}%` }]}>
-            <View
-              style={[sliderStyles.thumb, dragging && sliderStyles.thumbActive]}
-            />
-          </View>
-        </View>
-      </View>
-
-      {/* Etiquetas de extremos */}
-      <View style={sliderStyles.labelsRow}>
-        <Text style={sliderStyles.labelText}>0</Text>
-        <Text style={sliderStyles.labelText}>100</Text>
-      </View>
-    </View>
-  );
-}
-
-const sliderStyles = StyleSheet.create({
-  card: {
-    backgroundColor: COLORS.card,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    paddingTop: 14,
-    paddingBottom: 12,
-    paddingHorizontal: 20,
-  },
-  indicatorBox: {
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  valueText: {
-    fontSize: 26,
-    fontWeight: "800",
-    color: COLORS.base,
-    fontVariant: ["tabular-nums"],
-  },
-  valueTextActive: { fontSize: 34 },
-  trackWrap: { paddingVertical: 16 },
-  track: {
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#E2DDF6",
-  },
-  trackFill: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    bottom: 0,
-    borderRadius: 3,
-    backgroundColor: COLORS.baseLight,
-  },
-  thumbBox: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    justifyContent: "center",
-    marginLeft: -13,
-  },
-  thumb: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: COLORS.base,
-    borderWidth: 3,
-    borderColor: COLORS.white,
-    shadowColor: "#000",
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 4,
-  },
-  thumbActive: { transform: [{ scale: 1.15 }] },
-  labelsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  labelText: { fontSize: 12, fontWeight: "600", color: COLORS.textMuted },
-});
 
 export default function RegisterScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();

@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
+import os
+import uuid
+
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
@@ -73,6 +76,16 @@ def update_profile(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    # Cambio de email (validando que no esté en uso)
+    if user_in.email and user_in.email != current_user.email:
+        dup = db.query(User).filter(User.email == user_in.email).first()
+        if dup:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Ese email ya está en uso por otra cuenta",
+            )
+        current_user.email = user_in.email
+
     if user_in.full_name is not None:
         current_user.full_name = user_in.full_name
     if user_in.phone is not None:
@@ -80,6 +93,42 @@ def update_profile(
     if user_in.age_range is not None:
         current_user.age_range = user_in.age_range
 
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+
+# ── SUBIR FOTO DE PERFIL ──
+AVATAR_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "uploads", "avatars")
+os.makedirs(AVATAR_DIR, exist_ok=True)
+
+_ALLOWED_IMG = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}
+
+
+@router.post("/avatar", response_model=UserOut)
+async def upload_avatar(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if file.content_type not in _ALLOWED_IMG:
+        raise HTTPException(status_code=400, detail="Formato no permitido. Usa JPG, PNG o WEBP.")
+
+    ext = _ALLOWED_IMG[file.content_type]
+    filename = f"{uuid.uuid4()}.{ext}"
+    path = os.path.join(AVATAR_DIR, filename)
+
+    content = await file.read()
+    with open(path, "wb") as f:
+        f.write(content)
+
+    # Borrar avatar anterior si era local
+    if current_user.avatar_url and current_user.avatar_url.startswith("/uploads/avatars/"):
+        old = os.path.join(AVATAR_DIR, os.path.basename(current_user.avatar_url))
+        if os.path.exists(old):
+            os.remove(old)
+
+    current_user.avatar_url = f"/uploads/avatars/{filename}"
     db.commit()
     db.refresh(current_user)
     return current_user
