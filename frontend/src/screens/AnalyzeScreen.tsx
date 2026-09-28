@@ -7,7 +7,6 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -17,6 +16,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { analyzeText, analyzeImage } from "../services/api";
 import { COLORS } from "../theme/colors";
 import type { Analysis } from "../types";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type MainStackParamList = {
   Home: undefined;
@@ -29,6 +29,8 @@ type MainStackParamList = {
 type Props = NativeStackScreenProps<MainStackParamList, "Analyze">;
 
 export default function AnalyzeScreen({ navigation }: Props) {
+  const insets = useSafeAreaInsets();
+
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -40,6 +42,7 @@ export default function AnalyzeScreen({ navigation }: Props) {
     setLoading(true);
     try {
       const result = await analyzeText(text);
+      setText("");
       navigation.navigate("Result", { result });
     } catch (err: any) {
       Alert.alert(
@@ -81,21 +84,21 @@ export default function AnalyzeScreen({ navigation }: Props) {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.centered}>
+      <View style={styles.centered}>
         <ActivityIndicator size="large" color={COLORS.base} />
         <Text style={styles.loadingText}>Analizando...</Text>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
         {/* Encabezado morado */}
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: 12 + insets.top }]}>
           <Pressable
             style={styles.backButton}
             onPress={() => navigation.goBack()}
@@ -149,7 +152,7 @@ export default function AnalyzeScreen({ navigation }: Props) {
       </ScrollView>
 
       {/* Barra inferior */}
-      <View style={styles.tabBar}>
+      <View style={[styles.tabBar, { paddingBottom: 16 + insets.bottom }]}>
         <TabItem
           icon="🏠"
           label="Inicio"
@@ -167,7 +170,7 @@ export default function AnalyzeScreen({ navigation }: Props) {
           onPress={() => navigation.navigate("Settings")}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
