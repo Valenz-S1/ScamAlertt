@@ -13,7 +13,6 @@ import {
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { login } from "../services/api";
-import { COLORS } from "../theme/colors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import PasswordInput from "../components/PasswordInput";
 
@@ -23,6 +22,25 @@ type AuthStackParamList = {
 };
 
 type Props = NativeStackScreenProps<AuthStackParamList, "Login">;
+
+const COLORS = {
+  bg: "#F2F4F7",
+  card: "#FFFFFF",
+  text: "#1E293B",
+  textMuted: "#64748B",
+  label: "#64748B",
+  border: "#E2E8F0",
+  accent: "#51A2E2",
+  white: "#FFFFFF",
+};
+
+const softShadow = {
+  shadowColor: "#1E293B",
+  shadowOffset: { width: 0, height: 6 },
+  shadowOpacity: 0.06,
+  shadowRadius: 16,
+  elevation: 3,
+};
 
 export default function LoginScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
@@ -61,17 +79,18 @@ export default function LoginScreen({ navigation }: Props) {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: insets.top + 24 },
+        ]}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Encabezado morado */}
-        <View style={[styles.header, { paddingTop: insets.top + 48 }]}>
-          <View style={styles.logoBox}>
-            <Image
-              source={require("../../assets/icon.png")}
-              style={styles.logoImage}
-            />
-          </View>
+        {/* Tarjeta superior: logo y nombre de la app */}
+        <View style={styles.headerCard}>
+          <Image
+            source={require("../../assets/icon.png")}
+            style={styles.logoImage}
+          />
 
           <Text style={styles.brandName}>ScamAlert</Text>
 
@@ -80,8 +99,8 @@ export default function LoginScreen({ navigation }: Props) {
           </Text>
         </View>
 
-        {/* Formulario */}
-        <View style={styles.form}>
+        {/* Tarjeta del formulario */}
+        <View style={styles.formCard}>
           <Text style={styles.sectionTitle}>Iniciar sesión</Text>
 
           <Text style={styles.label}>EMAIL</Text>
@@ -134,48 +153,46 @@ const styles = StyleSheet.create({
   },
 
   scrollContent: {
+    paddingHorizontal: 20,
     paddingBottom: 40,
   },
 
-  header: {
-    backgroundColor: COLORS.base,
+  headerCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: 32,
+    paddingVertical: 32,
     paddingHorizontal: 24,
-    paddingTop: 48,
-    paddingBottom: 40,
-    borderBottomLeftRadius: 28,
-    borderBottomRightRadius: 28,
     alignItems: "center",
-  },
-
-  logoBox: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
-    overflow: "hidden",
-    marginBottom: 12,
+    marginBottom: 20,
+    marginHorizontal: 20,
+    ...softShadow,
   },
 
   logoImage: {
-    width: 56,
-    height: 56,
+    width: 72,
+    height: 72,
+    borderRadius: 20,
+    marginBottom: 16,
   },
 
   brandName: {
-    color: COLORS.white,
-    fontSize: 28,
+    color: COLORS.text,
+    fontSize: 26,
     fontWeight: "700",
   },
 
   tagline: {
-    color: COLORS.headerTint,
+    color: COLORS.textMuted,
     fontSize: 14,
     marginTop: 6,
     textAlign: "center",
   },
 
-  form: {
-    paddingHorizontal: 24,
-    paddingTop: 32,
+  formCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: 32,
+    padding: 24,
+    ...softShadow,
   },
 
   sectionTitle: {
@@ -196,7 +213,7 @@ const styles = StyleSheet.create({
 
   input: {
     backgroundColor: COLORS.card,
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: COLORS.border,
     paddingHorizontal: 16,
@@ -206,11 +223,12 @@ const styles = StyleSheet.create({
   },
 
   mainButton: {
-    backgroundColor: COLORS.base,
+    backgroundColor: COLORS.accent,
     paddingVertical: 16,
-    borderRadius: 14,
+    borderRadius: 999,
     alignItems: "center",
     marginTop: 28,
+    ...softShadow,
   },
 
   buttonDisabled: {
@@ -236,7 +254,8 @@ const styles = StyleSheet.create({
 
   footerLink: {
     fontSize: 14,
-    color: COLORS.base,
+    color: COLORS.accent,
     fontWeight: "700",
+    textDecorationLine: "underline",
   },
 });
