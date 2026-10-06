@@ -15,7 +15,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { register, login } from "../services/api";
 import PasswordInput from "../components/PasswordInput";
 import AgeSlider from "../components/AgeSlider";
-import { COLORS } from "../theme/colors";
 import {
   validateName,
   validateEmail,
@@ -43,6 +42,26 @@ function validatePassword(v: string): string | undefined {
   if (v.length < 8) return "Mínimo 8 caracteres";
   return undefined;
 }
+
+const COLORS = {
+  bg: "#F2F4F7",
+  card: "#FFFFFF",
+  text: "#1E293B",
+  textMuted: "#64748B",
+  label: "#64748B",
+  border: "#E2E8F0",
+  accent: "#51A2E2",
+  red: "#EF4444",
+  white: "#FFFFFF",
+};
+
+const softShadow = {
+  shadowColor: "#1E293B",
+  shadowOffset: { width: 0, height: 6 },
+  shadowOpacity: 0.06,
+  shadowRadius: 16,
+  elevation: 3,
+};
 
 export default function RegisterScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
@@ -155,7 +174,7 @@ export default function RegisterScreen({ navigation }: Props) {
         </View>
 
         {/* Formulario */}
-        <View style={styles.form}>
+        <View style={styles.formCard}>
           <Text style={styles.label}>NOMBRE COMPLETO *</Text>
           <TextInput
             style={[styles.input, errors.name && styles.inputError]}
@@ -239,28 +258,32 @@ export default function RegisterScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.bg },
-  scrollContent: { paddingBottom: 40 },
+  scrollContent: { paddingHorizontal: 20, paddingBottom: 40 },
 
   header: {
-    backgroundColor: COLORS.base,
-    paddingHorizontal: 24,
-    paddingBottom: 28,
-    borderBottomLeftRadius: 28,
-    borderBottomRightRadius: 28,
+    paddingHorizontal: 4,
+    paddingBottom: 4,
   },
   backButton: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(255,255,255,0.12)",
+    backgroundColor: COLORS.card,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
     marginBottom: 16,
+    ...softShadow,
   },
-  backText: { color: COLORS.white, fontSize: 13, fontWeight: "600" },
-  title: { color: COLORS.white, fontSize: 24, fontWeight: "700" },
-  subtitle: { color: COLORS.headerTint, fontSize: 14, marginTop: 6 },
+  backText: { color: COLORS.text, fontSize: 13, fontWeight: "600" },
+  title: { color: COLORS.text, fontSize: 24, fontWeight: "700" },
+  subtitle: { color: COLORS.textMuted, fontSize: 14, marginTop: 6 },
 
-  form: { paddingHorizontal: 24, paddingTop: 24 },
+  formCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: 32,
+    padding: 24,
+    marginTop: 20,
+    ...softShadow,
+  },
   label: {
     fontSize: 12,
     fontWeight: "700",
@@ -271,7 +294,7 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: COLORS.card,
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: COLORS.border,
     paddingHorizontal: 16,
@@ -289,11 +312,12 @@ const styles = StyleSheet.create({
   ageHint: { fontSize: 12, color: COLORS.textMuted, marginTop: 6 },
 
   mainButton: {
-    backgroundColor: COLORS.base,
+    backgroundColor: COLORS.accent,
     paddingVertical: 16,
-    borderRadius: 14,
+    borderRadius: 999,
     alignItems: "center",
     marginTop: 28,
+    ...softShadow,
   },
   buttonDisabled: { opacity: 0.6 },
   mainButtonText: { color: COLORS.white, fontSize: 16, fontWeight: "700" },

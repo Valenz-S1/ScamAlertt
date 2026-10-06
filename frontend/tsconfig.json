@@ -3,7 +3,7 @@
     "strict": true,
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "jsx": "react-native",
     "esModuleInterop": true,
     "skipLibCheck": true,

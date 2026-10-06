@@ -27,7 +27,6 @@ import {
   validateEmail,
   validatePhone,
 } from "../utils/validation";
-import { COLORS } from "../theme/colors";
 
 type Props = NativeStackScreenProps<any, any>;
 
@@ -48,6 +47,27 @@ function getErrMsg(err: any): string {
 
   return "No se pudo guardar. Verifica tu conexión.";
 }
+
+const COLORS = {
+  bg: "#F2F4F7",
+  card: "#FFFFFF",
+  text: "#1E293B",
+  textMuted: "#64748B",
+  label: "#64748B",
+  border: "#E2E8F0",
+  accent: "#51A2E2",
+  accentSoft: "#EAF4FC",
+  red: "#EF4444",
+  white: "#FFFFFF",
+};
+
+const softShadow = {
+  shadowColor: "#1E293B",
+  shadowOffset: { width: 0, height: 6 },
+  shadowOpacity: 0.06,
+  shadowRadius: 16,
+  elevation: 3,
+};
 
 export default function ProfileScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
@@ -151,7 +171,7 @@ export default function ProfileScreen({ navigation }: Props) {
   if (loading) {
     return (
       <View style={[styles.centered, { paddingTop: insets.top }]}>
-        <ActivityIndicator size="large" color={COLORS.base} />
+        <ActivityIndicator size="large" color={COLORS.accent} />
       </View>
     );
   }
@@ -281,6 +301,7 @@ const styles = StyleSheet.create({
   },
 
   scrollContent: {
+    paddingHorizontal: 20,
     paddingBottom: 40,
   },
 
@@ -292,40 +313,43 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    backgroundColor: COLORS.base,
-    paddingHorizontal: 24,
-    paddingBottom: 28,
+    paddingHorizontal: 4,
+    paddingBottom: 4,
   },
 
   backButton: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(255,255,255,0.12)",
+    backgroundColor: COLORS.card,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
     marginBottom: 16,
+    ...softShadow,
   },
 
   backText: {
-    color: COLORS.white,
+    color: COLORS.text,
     fontSize: 13,
     fontWeight: "600",
   },
 
   title: {
-    color: COLORS.white,
+    color: COLORS.text,
     fontSize: 24,
     fontWeight: "700",
   },
 
   form: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
+    backgroundColor: COLORS.card,
+    borderRadius: 32,
+    padding: 24,
+    marginTop: 20,
+    ...softShadow,
   },
 
   avatarWrap: {
     alignSelf: "center",
-    marginTop: -44,
+    marginTop: 4,
   },
 
   avatar: {
@@ -333,16 +357,16 @@ const styles = StyleSheet.create({
     height: 96,
     borderRadius: 48,
     borderWidth: 3,
-    borderColor: COLORS.white,
+    borderColor: COLORS.border,
   },
 
   avatarPlaceholder: {
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: COLORS.baseBg,
+    backgroundColor: COLORS.accentSoft,
     borderWidth: 3,
-    borderColor: COLORS.white,
+    borderColor: COLORS.border,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -350,14 +374,14 @@ const styles = StyleSheet.create({
   avatarInitial: {
     fontSize: 36,
     fontWeight: "700",
-    color: COLORS.base,
+    color: COLORS.accent,
   },
 
   cameraBadge: {
     position: "absolute",
     right: -2,
     bottom: -2,
-    backgroundColor: COLORS.base,
+    backgroundColor: COLORS.accent,
     width: 30,
     height: 30,
     borderRadius: 15,
@@ -376,6 +400,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: COLORS.textMuted,
     marginTop: 8,
+    marginBottom: 8,
   },
 
   label: {
@@ -389,7 +414,7 @@ const styles = StyleSheet.create({
 
   input: {
     backgroundColor: COLORS.card,
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: COLORS.border,
     paddingHorizontal: 16,
@@ -410,11 +435,12 @@ const styles = StyleSheet.create({
   },
 
   saveButton: {
-    backgroundColor: COLORS.base,
+    backgroundColor: COLORS.accent,
     paddingVertical: 16,
-    borderRadius: 14,
+    borderRadius: 999,
     alignItems: "center",
     marginTop: 28,
+    ...softShadow,
   },
 
   buttonDisabled: {

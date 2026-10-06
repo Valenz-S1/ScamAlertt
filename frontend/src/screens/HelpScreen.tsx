@@ -2,9 +2,27 @@ import React from "react";
 import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { COLORS } from "../theme/colors";
 
 type Props = NativeStackScreenProps<any, any>;
+
+const COLORS = {
+  bg: "#F2F4F7",
+  card: "#FFFFFF",
+  text: "#1E293B",
+  textMuted: "#64748B",
+  border: "#E2E8F0",
+  accent: "#51A2E2",
+  accentSoft: "#EAF4FC",
+  white: "#FFFFFF",
+};
+
+const softShadow = {
+  shadowColor: "#1E293B",
+  shadowOffset: { width: 0, height: 6 },
+  shadowOpacity: 0.06,
+  shadowRadius: 16,
+  elevation: 3,
+};
 
 const TIPS = [
   {
@@ -63,7 +81,7 @@ export default function HelpScreen({ navigation }: Props) {
   return (
     <View style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Encabezado morado */}
+        {/* Encabezado */}
         <View style={[styles.header, { paddingTop: 12 + insets.top }]}>
           <Pressable
             style={styles.backButton}
@@ -109,37 +127,38 @@ const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 32 },
 
   header: {
-    backgroundColor: COLORS.base,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingTop: 12,
-    paddingBottom: 28,
+    paddingBottom: 4,
   },
   backButton: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(255,255,255,0.12)",
+    backgroundColor: COLORS.card,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
     marginBottom: 16,
+    ...softShadow,
   },
-  backText: { color: COLORS.white, fontSize: 13, fontWeight: "600" },
-  title: { color: COLORS.white, fontSize: 24, fontWeight: "700" },
-  subtitle: { color: COLORS.headerTint, fontSize: 14, marginTop: 6 },
+  backText: { color: COLORS.text, fontSize: 13, fontWeight: "600" },
+  title: { color: COLORS.text, fontSize: 24, fontWeight: "700" },
+  subtitle: { color: COLORS.textMuted, fontSize: 14, marginTop: 6 },
 
-  list: { paddingHorizontal: 20, paddingTop: 16 },
+  list: { paddingHorizontal: 20, paddingTop: 20 },
   tipCard: {
     flexDirection: "row",
     backgroundColor: COLORS.card,
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 16,
     marginBottom: 12,
     alignItems: "flex-start",
+    ...softShadow,
   },
   tipIconBox: {
     width: 44,
     height: 44,
-    borderRadius: 12,
-    backgroundColor: COLORS.baseBg,
+    borderRadius: 14,
+    backgroundColor: COLORS.accentSoft,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -162,10 +181,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginTop: 8,
     padding: 16,
-    backgroundColor: COLORS.greenBg,
-    borderRadius: 16,
+    backgroundColor: COLORS.accentSoft,
+    borderRadius: 20,
     borderLeftWidth: 4,
-    borderLeftColor: COLORS.green,
+    borderLeftColor: COLORS.accent,
   },
   noteText: {
     fontSize: 13,

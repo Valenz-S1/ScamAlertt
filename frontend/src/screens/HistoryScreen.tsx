@@ -11,10 +11,29 @@ import {
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getHistory, getStats } from "../services/api";
-import { COLORS, RISK_CONFIG, RiskLevel } from "../theme/colors";
+import { RISK_CONFIG, RiskLevel } from "../theme/colors";
 import type { Analysis, AnalysisStats } from "../types";
 
 type Props = NativeStackScreenProps<any, any>;
+
+const COLORS = {
+  bg: "#F2F4F7",
+  card: "#FFFFFF",
+  text: "#1E293B",
+  textMuted: "#64748B",
+  border: "#E2E8F0",
+  accent: "#51A2E2",
+  accentSoft: "#EAF4FC",
+  white: "#FFFFFF",
+};
+
+const softShadow = {
+  shadowColor: "#1E293B",
+  shadowOffset: { width: 0, height: 6 },
+  shadowOpacity: 0.06,
+  shadowRadius: 16,
+  elevation: 3,
+};
 
 type FilterOption = "all" | RiskLevel;
 
@@ -171,7 +190,7 @@ const wheelStyles = StyleSheet.create({
   itemTextSelected: {
     fontSize: 18,
     fontWeight: "700",
-    color: COLORS.base,
+    color: COLORS.accent,
   },
 
   overlay: {
@@ -192,7 +211,7 @@ const wheelStyles = StyleSheet.create({
 
   line: {
     height: 1.5,
-    backgroundColor: "#C9C3F0",
+    backgroundColor: COLORS.border,
     marginHorizontal: 4,
   },
 });
@@ -315,7 +334,7 @@ function DateFilterModal({
 const modalStyles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: "rgba(20,15,50,0.5)",
+    backgroundColor: "rgba(30,41,59,0.5)",
     alignItems: "center",
     justifyContent: "center",
     padding: 24,
@@ -325,14 +344,14 @@ const modalStyles = StyleSheet.create({
     width: "100%",
     maxWidth: 360,
     backgroundColor: COLORS.card,
-    borderRadius: 20,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
+    borderRadius: 32,
+    padding: 24,
+    shadowColor: "#1E293B",
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
     shadowOffset: {
       width: 0,
-      height: 8,
+      height: 10,
     },
     elevation: 10,
   },
@@ -367,13 +386,13 @@ const modalStyles = StyleSheet.create({
   cancelBtn: {
     flex: 1,
     paddingVertical: 13,
-    borderRadius: 12,
+    borderRadius: 999,
     alignItems: "center",
-    backgroundColor: COLORS.baseBg,
+    backgroundColor: COLORS.accentSoft,
   },
 
   cancelText: {
-    color: COLORS.base,
+    color: COLORS.accent,
     fontWeight: "700",
     fontSize: 14,
   },
@@ -381,9 +400,9 @@ const modalStyles = StyleSheet.create({
   applyBtn: {
     flex: 1,
     paddingVertical: 13,
-    borderRadius: 12,
+    borderRadius: 999,
     alignItems: "center",
-    backgroundColor: COLORS.base,
+    backgroundColor: COLORS.accent,
   },
 
   applyText: {
@@ -677,7 +696,7 @@ function TabItem({
   active?: boolean;
   onPress?: () => void;
 }) {
-  const color = active ? COLORS.base : COLORS.textMuted;
+  const color = active ? COLORS.accent : COLORS.textMuted;
 
   return (
     <Pressable style={styles.tabItem} onPress={onPress}>
@@ -706,19 +725,18 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    backgroundColor: COLORS.base,
     paddingHorizontal: 24,
     paddingBottom: 20,
   },
 
   title: {
-    color: COLORS.white,
+    color: COLORS.text,
     fontSize: 26,
     fontWeight: "700",
   },
 
   subtitle: {
-    color: COLORS.headerTint,
+    color: COLORS.textMuted,
     fontSize: 14,
     marginTop: 4,
   },
@@ -733,17 +751,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: COLORS.card,
-    borderRadius: 20,
+    borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 8,
     marginRight: 8,
     borderWidth: 1,
     borderColor: COLORS.border,
+    ...softShadow,
   },
 
   filterChipActive: {
-    backgroundColor: COLORS.base,
-    borderColor: COLORS.base,
+    backgroundColor: COLORS.accent,
+    borderColor: COLORS.accent,
   },
 
   filterIcon: {
@@ -771,16 +790,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: COLORS.card,
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: COLORS.border,
     paddingHorizontal: 12,
     paddingVertical: 12,
+    ...softShadow,
   },
 
   dateBoxActive: {
-    borderColor: COLORS.base,
-    backgroundColor: COLORS.baseBg,
+    borderColor: COLORS.accent,
+    backgroundColor: COLORS.accentSoft,
   },
 
   dateIcon: {
@@ -811,7 +831,7 @@ const styles = StyleSheet.create({
 
   dateArrow: {
     fontSize: 11,
-    color: COLORS.base,
+    color: COLORS.accent,
     marginLeft: 4,
   },
 
@@ -824,15 +844,16 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     backgroundColor: COLORS.card,
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 14,
     marginBottom: 12,
+    ...softShadow,
   },
 
   rowIconBox: {
     width: 44,
     height: 44,
-    borderRadius: 12,
+    borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -892,9 +913,10 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: "row",
     backgroundColor: COLORS.card,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
     paddingVertical: 10,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    ...softShadow,
   },
 
   tabItem: {

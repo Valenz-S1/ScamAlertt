@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { getHistory, getStats, getProfile } from "../services/api";
-import { COLORS, RISK_CONFIG, RiskLevel } from "../theme/colors";
+import { RISK_CONFIG, RiskLevel } from "../theme/colors";
 import type { Analysis, AnalysisStats } from "../types";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -23,6 +23,27 @@ type MainStackParamList = {
 };
 
 type Props = NativeStackScreenProps<MainStackParamList, "Home">;
+
+const COLORS = {
+  bg: "#F2F4F7",
+  card: "#FFFFFF",
+  text: "#1E293B",
+  textMuted: "#64748B",
+  border: "#E2E8F0",
+  accent: "#51A2E2",
+  red: "#EF4444",
+  yellow: "#F59E0B",
+  green: "#22C55E",
+  white: "#FFFFFF",
+};
+
+const softShadow = {
+  shadowColor: "#1E293B",
+  shadowOffset: { width: 0, height: 6 },
+  shadowOpacity: 0.06,
+  shadowRadius: 16,
+  elevation: 3,
+};
 
 export default function HomeScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
@@ -69,15 +90,13 @@ export default function HomeScreen({ navigation }: Props) {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Encabezado morado */}
-        <View style={[styles.header, { paddingTop: 16 + insets.top }]}>
+        {/* Tarjeta de encabezado */}
+        <View style={[styles.headerCard, { marginTop: insets.top + 16 }]}>
           <View style={styles.brandRow}>
-            <View style={styles.logoBox}>
-              <Image
-                source={require("../../assets/icon.png")}
-                style={styles.logoImage}
-              />
-            </View>
+            <Image
+              source={require("../../assets/icon.png")}
+              style={styles.logoImage}
+            />
             <Text style={styles.brandName}>ScamAlert</Text>
           </View>
 
@@ -100,14 +119,14 @@ export default function HomeScreen({ navigation }: Props) {
           <StatCard
             value={String(stats?.total ?? 0)}
             label="Tus análisis"
-            valueColor={COLORS.base}
+            valueColor={COLORS.accent}
           />
           <StatCard
             value={state.icon}
             label={state.label}
             valueColor={state.color}
           />
-          <StatCard value="24/7" label="Disponible" valueColor={COLORS.base} />
+          <StatCard value="24/7" label="Disponible" valueColor={COLORS.accent} />
         </View>
 
         {/* Análisis recientes */}
@@ -121,7 +140,7 @@ export default function HomeScreen({ navigation }: Props) {
         {loading ? (
           <ActivityIndicator
             size="small"
-            color={COLORS.base}
+            color={COLORS.accent}
             style={{ marginTop: 20 }}
           />
         ) : recent.length === 0 ? (
@@ -218,7 +237,7 @@ function TabBar({
     <View style={[styles.tabBar, { paddingBottom: 16 + bottomInset }]}>
       {tabs.map((tab) => {
         const isActive = active === tab.key;
-        const color = isActive ? COLORS.base : COLORS.textMuted;
+        const color = isActive ? COLORS.accent : COLORS.textMuted;
         return (
           <Pressable
             key={tab.key}
@@ -241,68 +260,54 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContent: { paddingBottom: 24 },
 
-  header: {
-    backgroundColor: COLORS.base,
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 48,
-    borderBottomLeftRadius: 28,
-    borderBottomRightRadius: 28,
+  headerCard: {
+    backgroundColor: COLORS.card,
+    marginHorizontal: 20,
+    borderRadius: 32,
+    padding: 24,
+    ...softShadow,
   },
   brandRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 20,
   },
-  logoBox: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: "#FF6B4A",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 10,
-  },
-  logoImage: { width: 40, height: 40, borderRadius: 12 },
-  logoIcon: { fontSize: 20 },
-  brandName: { color: COLORS.white, fontSize: 20, fontWeight: "700" },
-  greeting: { color: COLORS.headerTint, fontSize: 16, marginBottom: 6 },
+  logoImage: { width: 40, height: 40, borderRadius: 12, marginRight: 10 },
+  brandName: { color: COLORS.text, fontSize: 20, fontWeight: "700" },
+  greeting: { color: COLORS.textMuted, fontSize: 16, marginBottom: 6 },
   headline: {
-    color: COLORS.white,
-    fontSize: 26,
+    color: COLORS.text,
+    fontSize: 24,
     fontWeight: "700",
-    lineHeight: 32,
-    marginBottom: 24,
+    lineHeight: 30,
+    marginBottom: 20,
   },
   analyzeButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: COLORS.baseLight,
+    backgroundColor: COLORS.accent,
     paddingVertical: 16,
-    borderRadius: 16,
+    borderRadius: 999,
+    ...softShadow,
   },
   analyzeIcon: { fontSize: 18, marginRight: 8 },
   analyzeText: { color: COLORS.white, fontSize: 17, fontWeight: "700" },
 
   statsRow: {
     flexDirection: "row",
-    marginTop: -32,
+    marginTop: 16,
     marginHorizontal: 20,
     marginBottom: 8,
   },
   statCard: {
     flex: 1,
     backgroundColor: COLORS.card,
-    borderRadius: 16,
+    borderRadius: 20,
     paddingVertical: 16,
     alignItems: "center",
     marginHorizontal: 4,
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
+    ...softShadow,
   },
   statValue: { fontSize: 18, fontWeight: "700" },
   statLabel: {
@@ -321,21 +326,22 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: { fontSize: 18, fontWeight: "700", color: COLORS.text },
-  sectionLink: { fontSize: 14, color: "#5B4BD6", fontWeight: "600" },
+  sectionLink: { fontSize: 14, color: COLORS.accent, fontWeight: "600" },
 
   list: { paddingHorizontal: 20 },
   row: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: COLORS.card,
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 14,
     marginBottom: 12,
+    ...softShadow,
   },
   rowIconBox: {
     width: 44,
     height: 44,
-    borderRadius: 12,
+    borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -357,10 +363,11 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: "row",
     backgroundColor: COLORS.card,
-    borderTopWidth: 1,
-    borderTopColor: "#EEEEF2",
     paddingVertical: 10,
     paddingBottom: 16,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    ...softShadow,
   },
   tabItem: { flex: 1, alignItems: "center" },
   tabIcon: { fontSize: 20, marginBottom: 2 },

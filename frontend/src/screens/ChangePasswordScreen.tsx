@@ -11,11 +11,30 @@ import {
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { changePassword } from "../services/api";
-import { COLORS } from "../theme/colors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import PasswordInput from "../components/PasswordInput";
 
 type Props = NativeStackScreenProps<any, any>;
+
+const COLORS = {
+  bg: "#F2F4F7",
+  card: "#FFFFFF",
+  text: "#1E293B",
+  textMuted: "#64748B",
+  label: "#64748B",
+  border: "#E2E8F0",
+  accent: "#51A2E2",
+  red: "#EF4444",
+  white: "#FFFFFF",
+};
+
+const softShadow = {
+  shadowColor: "#1E293B",
+  shadowOffset: { width: 0, height: 6 },
+  shadowOpacity: 0.06,
+  shadowRadius: 16,
+  elevation: 3,
+};
 
 export default function ChangePasswordScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
@@ -77,7 +96,7 @@ export default function ChangePasswordScreen({ navigation }: Props) {
             <Text style={styles.title}>Cambiar contraseña</Text>
           </View>
 
-          <View style={styles.form}>
+          <View style={styles.formCard}>
             <Text style={styles.label}>CONTRASEÑA ACTUAL</Text>
             <PasswordInput
               value={current}
@@ -128,26 +147,32 @@ export default function ChangePasswordScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORS.bg },
   flex: { flex: 1 },
-  scrollContent: { paddingBottom: 40 },
+  scrollContent: { paddingHorizontal: 20, paddingBottom: 40 },
 
   header: {
-    backgroundColor: COLORS.base,
-    paddingHorizontal: 24,
+    paddingHorizontal: 4,
     paddingTop: 12,
-    paddingBottom: 28,
+    paddingBottom: 4,
   },
   backButton: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(255,255,255,0.12)",
+    backgroundColor: COLORS.card,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
     marginBottom: 16,
+    ...softShadow,
   },
-  backText: { color: COLORS.white, fontSize: 13, fontWeight: "600" },
-  title: { color: COLORS.white, fontSize: 24, fontWeight: "700" },
+  backText: { color: COLORS.text, fontSize: 13, fontWeight: "600" },
+  title: { color: COLORS.text, fontSize: 24, fontWeight: "700" },
 
-  form: { paddingHorizontal: 24, paddingTop: 24 },
+  formCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: 32,
+    padding: 24,
+    marginTop: 20,
+    ...softShadow,
+  },
   label: {
     fontSize: 12,
     fontWeight: "700",
@@ -158,7 +183,7 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: COLORS.card,
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: COLORS.border,
     paddingHorizontal: 16,
@@ -167,11 +192,12 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
   mainButton: {
-    backgroundColor: COLORS.base,
+    backgroundColor: COLORS.accent,
     paddingVertical: 16,
-    borderRadius: 14,
+    borderRadius: 999,
     alignItems: "center",
     marginTop: 28,
+    ...softShadow,
   },
   buttonDisabled: { opacity: 0.6 },
   mainButtonText: { color: COLORS.white, fontSize: 16, fontWeight: "700" },

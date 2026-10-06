@@ -12,7 +12,6 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { getProfile, logout, API_BASE } from "../services/api";
-import { COLORS } from "../theme/colors";
 import type { User } from "../types";
 
 type MainStackParamList = {
@@ -26,6 +25,26 @@ type MainStackParamList = {
 };
 
 type Props = NativeStackScreenProps<MainStackParamList, "Settings">;
+
+const COLORS = {
+  bg: "#F2F4F7",
+  card: "#FFFFFF",
+  text: "#1E293B",
+  textMuted: "#64748B",
+  border: "#E2E8F0",
+  accent: "#51A2E2",
+  accentSoft: "#EAF4FC",
+  red: "#EF4444",
+  white: "#FFFFFF",
+};
+
+const softShadow = {
+  shadowColor: "#1E293B",
+  shadowOffset: { width: 0, height: 6 },
+  shadowOpacity: 0.06,
+  shadowRadius: 16,
+  elevation: 3,
+};
 
 export default function SettingsScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
@@ -64,7 +83,7 @@ export default function SettingsScreen({ navigation }: Props) {
   return (
     <View style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Encabezado morado */}
+        {/* Encabezado */}
         <View style={[styles.header, { paddingTop: 16 + insets.top }]}>
           <Text style={styles.title}>Ajustes</Text>
           <Text style={styles.subtitle}>Tu cuenta y preferencias</Text>
@@ -73,7 +92,7 @@ export default function SettingsScreen({ navigation }: Props) {
         {loading ? (
           <ActivityIndicator
             size="small"
-            color={COLORS.base}
+            color={COLORS.accent}
             style={{ marginTop: 20 }}
           />
         ) : (
@@ -197,7 +216,7 @@ function TabItem({
   active?: boolean;
   onPress?: () => void;
 }) {
-  const color = active ? COLORS.base : COLORS.textMuted;
+  const color = active ? COLORS.accent : COLORS.textMuted;
   return (
     <Pressable style={styles.tabItem} onPress={onPress}>
       <Text style={[styles.tabIcon, { opacity: active ? 1 : 0.6 }]}>
@@ -213,27 +232,27 @@ const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 24 },
 
   header: {
-    backgroundColor: COLORS.base,
     paddingHorizontal: 24,
     paddingTop: 16,
     paddingBottom: 20,
   },
-  title: { color: COLORS.white, fontSize: 26, fontWeight: "700" },
-  subtitle: { color: COLORS.headerTint, fontSize: 14, marginTop: 4 },
+  title: { color: COLORS.text, fontSize: 26, fontWeight: "700" },
+  subtitle: { color: COLORS.textMuted, fontSize: 14, marginTop: 4 },
 
   card: {
     backgroundColor: COLORS.card,
     marginHorizontal: 20,
     marginTop: 16,
-    borderRadius: 20,
+    borderRadius: 28,
     padding: 20,
+    ...softShadow,
   },
   profileRow: { flexDirection: "row", alignItems: "center" },
   avatar: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: COLORS.baseBg,
+    backgroundColor: COLORS.accentSoft,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 14,
@@ -241,7 +260,7 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 22,
     fontWeight: "700",
-    color: COLORS.base,
+    color: COLORS.accent,
   },
   profileInfo: { flex: 1 },
   profileName: { fontSize: 17, fontWeight: "700", color: COLORS.text },
@@ -256,10 +275,11 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: "row",
     backgroundColor: COLORS.card,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
     paddingVertical: 10,
     paddingBottom: 16,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    ...softShadow,
   },
   tabItem: { flex: 1, alignItems: "center" },
   tabIcon: { fontSize: 20, marginBottom: 2 },

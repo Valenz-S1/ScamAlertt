@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   itemText: { fontSize: 16, color: COLORS.textMuted },
   itemTextSelected: { fontSize: 20, fontWeight: "700", color: COLORS.base },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     flexDirection: "column",
   },
   flexGap: { flex: 1 },

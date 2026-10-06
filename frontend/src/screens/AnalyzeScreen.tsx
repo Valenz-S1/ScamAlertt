@@ -14,7 +14,6 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { analyzeText, analyzeImage } from "../services/api";
-import { COLORS } from "../theme/colors";
 import type { Analysis } from "../types";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -27,6 +26,26 @@ type MainStackParamList = {
 };
 
 type Props = NativeStackScreenProps<MainStackParamList, "Analyze">;
+
+const COLORS = {
+  bg: "#F2F4F7",
+  card: "#FFFFFF",
+  text: "#1E293B",
+  textMuted: "#64748B",
+  label: "#64748B",
+  border: "#E2E8F0",
+  accent: "#51A2E2",
+  accentSoft: "#EAF4FC",
+  white: "#FFFFFF",
+};
+
+const softShadow = {
+  shadowColor: "#1E293B",
+  shadowOffset: { width: 0, height: 6 },
+  shadowOpacity: 0.06,
+  shadowRadius: 16,
+  elevation: 3,
+};
 
 export default function AnalyzeScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
@@ -85,7 +104,7 @@ export default function AnalyzeScreen({ navigation }: Props) {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color={COLORS.base} />
+        <ActivityIndicator size="large" color={COLORS.accent} />
         <Text style={styles.loadingText}>Analizando...</Text>
       </View>
     );
@@ -97,7 +116,7 @@ export default function AnalyzeScreen({ navigation }: Props) {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Encabezado morado */}
+        {/* Encabezado */}
         <View style={[styles.header, { paddingTop: 12 + insets.top }]}>
           <Pressable
             style={styles.backButton}
@@ -111,7 +130,7 @@ export default function AnalyzeScreen({ navigation }: Props) {
           </Text>
         </View>
 
-        <View style={styles.content}>
+        <View style={styles.formCard}>
           <Text style={styles.label}>PEGA EL MENSAJE AQUÍ</Text>
 
           <TextInput
@@ -137,18 +156,17 @@ export default function AnalyzeScreen({ navigation }: Props) {
             <Text style={styles.uploadIcon}>📷</Text>
             <Text style={styles.uploadText}>Subir captura de pantalla</Text>
           </Pressable>
-        </View>
 
-        {/* Botón de analizar */}
-        <View style={styles.footer}>
+          {/* Botón de analizar */}
           <Pressable style={styles.analyzeButton} onPress={handleAnalyzeText}>
             <Text style={styles.analyzeIcon}>🔍</Text>
             <Text style={styles.analyzeText}>Analizar ahora</Text>
           </Pressable>
-          <Text style={styles.footerNote}>
-            Tu mensaje no se guarda ni se comparte con terceros
-          </Text>
         </View>
+
+        <Text style={styles.footerNote}>
+          Tu mensaje no se guarda ni se comparte con terceros
+        </Text>
       </ScrollView>
 
       {/* Barra inferior */}
@@ -185,7 +203,7 @@ function TabItem({
   active?: boolean;
   onPress?: () => void;
 }) {
-  const color = active ? COLORS.base : COLORS.textMuted;
+  const color = active ? COLORS.accent : COLORS.textMuted;
   return (
     <Pressable style={tabStyles.tabItem} onPress={onPress}>
       <Text style={[tabStyles.tabIcon, { opacity: active ? 1 : 0.6 }]}>
@@ -204,7 +222,7 @@ const tabStyles = StyleSheet.create({
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORS.bg },
-  scrollContent: { paddingBottom: 20 },
+  scrollContent: { paddingHorizontal: 20, paddingBottom: 20 },
   centered: {
     flex: 1,
     justifyContent: "center",
@@ -214,24 +232,30 @@ const styles = StyleSheet.create({
   loadingText: { marginTop: 12, color: COLORS.textMuted, fontSize: 14 },
 
   header: {
-    backgroundColor: COLORS.base,
-    paddingHorizontal: 24,
+    paddingHorizontal: 4,
     paddingTop: 12,
-    paddingBottom: 28,
+    paddingBottom: 4,
   },
   backButton: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(255,255,255,0.12)",
+    backgroundColor: COLORS.card,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
     marginBottom: 16,
+    ...softShadow,
   },
-  backText: { color: COLORS.white, fontSize: 13, fontWeight: "600" },
-  title: { color: COLORS.white, fontSize: 24, fontWeight: "700" },
-  subtitle: { color: COLORS.headerTint, fontSize: 14, marginTop: 6 },
+  backText: { color: COLORS.text, fontSize: 13, fontWeight: "600" },
+  title: { color: COLORS.text, fontSize: 24, fontWeight: "700" },
+  subtitle: { color: COLORS.textMuted, fontSize: 14, marginTop: 6 },
 
-  content: { paddingHorizontal: 24, paddingTop: 24 },
+  formCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: 32,
+    padding: 24,
+    marginTop: 20,
+    ...softShadow,
+  },
   label: {
     fontSize: 12,
     fontWeight: "700",
@@ -240,7 +264,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   textArea: {
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.bg,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -264,42 +288,45 @@ const styles = StyleSheet.create({
 
   uploadBox: {
     borderWidth: 1.5,
-    borderColor: "#C9C3F0",
+    borderColor: COLORS.accent,
     borderStyle: "dashed",
     borderRadius: 16,
     paddingVertical: 18,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
-    backgroundColor: COLORS.baseBg,
+    backgroundColor: COLORS.accentSoft,
   },
   uploadIcon: { fontSize: 18, marginRight: 8 },
-  uploadText: { fontSize: 14, fontWeight: "600", color: COLORS.base },
+  uploadText: { fontSize: 14, fontWeight: "600", color: COLORS.accent },
 
-  footer: { paddingHorizontal: 24, paddingBottom: 20, paddingTop: 12 },
   analyzeButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: COLORS.base,
+    backgroundColor: COLORS.accent,
     paddingVertical: 16,
-    borderRadius: 16,
+    borderRadius: 999,
+    marginTop: 24,
+    ...softShadow,
   },
   analyzeIcon: { fontSize: 18, marginRight: 8 },
   analyzeText: { color: COLORS.white, fontSize: 16, fontWeight: "700" },
+
   footerNote: {
     textAlign: "center",
     fontSize: 11,
     color: COLORS.textMuted,
-    marginTop: 10,
+    marginTop: 14,
   },
 
   tabBar: {
     flexDirection: "row",
     backgroundColor: COLORS.card,
-    borderTopWidth: 1,
-    borderTopColor: "#EEEEF2",
     paddingVertical: 10,
     paddingBottom: 16,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    ...softShadow,
   },
 });
