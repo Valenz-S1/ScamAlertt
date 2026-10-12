@@ -131,11 +131,6 @@ export default function SettingsScreen({ navigation }: Props) {
               label="Cambiar contraseña"
               onPress={() => navigation.navigate("ChangePassword")}
             />
-            <SettingsItem
-              icon="❓"
-              label="Ayuda para detectar estafas"
-              onPress={() => navigation.navigate("Help")}
-            />
 
             <View style={styles.divider} />
 

@@ -13,6 +13,8 @@ import { getHistory, getStats, getProfile } from "../services/api";
 import { RISK_CONFIG, RiskLevel } from "../theme/colors";
 import type { Analysis, AnalysisStats } from "../types";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import ComoFuncionaModal from "../components/ComoFuncionaModal";
+import ComoDetectarPhishingModal from "../components/ComoDetectarPhishingModal";
 
 type MainStackParamList = {
   Home: undefined;
@@ -52,6 +54,10 @@ export default function HomeScreen({ navigation }: Props) {
   const [stats, setStats] = useState<AnalysisStats | null>(null);
   const [userName, setUserName] = useState("");
   const [loading, setLoading] = useState(true);
+
+  // Modales de la guía de seguridad
+  const [showHowItWorks, setShowHowItWorks] = useState(false);
+  const [showPhishingGuide, setShowPhishingGuide] = useState(false);
 
   const loadHome = () => {
     getHistory(0, 3)
@@ -129,6 +135,45 @@ export default function HomeScreen({ navigation }: Props) {
           <StatCard value="24/7" label="Disponible" valueColor={COLORS.accent} />
         </View>
 
+        {/* Guía de seguridad */}
+        <View style={styles.guideSection}>
+          <Text style={styles.guideTitle}>Guía de seguridad</Text>
+
+          <Pressable
+            style={styles.guideCard}
+            onPress={() => setShowHowItWorks(true)}
+          >
+            <View style={styles.guideIconBox}>
+              <Text style={styles.guideIcon}>📖</Text>
+            </View>
+            <View style={styles.guideTextBox}>
+              <Text style={styles.guideCardTitle}>
+                ¿Cómo funciona ScamAlert?
+              </Text>
+              <Text style={styles.guideCardSubtitle}>
+                Aprende lo básico en 1 minuto
+              </Text>
+            </View>
+            <Text style={styles.guideChevron}>›</Text>
+          </Pressable>
+
+          <Pressable
+            style={styles.guideCard}
+            onPress={() => setShowPhishingGuide(true)}
+          >
+            <View style={styles.guideIconBox}>
+              <Text style={styles.guideIcon}>🛡️</Text>
+            </View>
+            <View style={styles.guideTextBox}>
+              <Text style={styles.guideCardTitle}>Detectar phishing</Text>
+              <Text style={styles.guideCardSubtitle}>
+                Señales de alerta y práctica interactiva
+              </Text>
+            </View>
+            <Text style={styles.guideChevron}>›</Text>
+          </Pressable>
+        </View>
+
         {/* Análisis recientes */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Análisis recientes</Text>
@@ -161,6 +206,20 @@ export default function HomeScreen({ navigation }: Props) {
         active="Home"
         bottomInset={insets.bottom}
         onNavigate={(screen) => navigation.navigate(screen as any)}
+      />
+
+      {/* Modales de la guía de seguridad */}
+      <ComoFuncionaModal
+        visible={showHowItWorks}
+        onClose={() => setShowHowItWorks(false)}
+        onStart={() => {
+          setShowHowItWorks(false);
+          navigation.navigate("Analyze");
+        }}
+      />
+      <ComoDetectarPhishingModal
+        visible={showPhishingGuide}
+        onClose={() => setShowPhishingGuide(false)}
       />
     </View>
   );
@@ -316,6 +375,38 @@ const styles = StyleSheet.create({
     marginTop: 4,
     textAlign: "center",
   },
+
+  // Guía de seguridad
+  guideSection: { marginHorizontal: 20, marginTop: 16 },
+  guideTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: COLORS.text,
+    marginBottom: 12,
+  },
+  guideCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.card,
+    borderRadius: 20,
+    padding: 16,
+    marginBottom: 10,
+    ...softShadow,
+  },
+  guideIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: COLORS.accentSoft,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  guideIcon: { fontSize: 20 },
+  guideTextBox: { flex: 1 },
+  guideCardTitle: { fontSize: 15, fontWeight: "700", color: COLORS.text },
+  guideCardSubtitle: { fontSize: 12, color: COLORS.textMuted, marginTop: 2 },
+  guideChevron: { fontSize: 22, color: COLORS.textMuted },
 
   sectionHeader: {
     flexDirection: "row",

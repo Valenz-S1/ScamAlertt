@@ -1,10 +1,10 @@
 // Colores base de ScamAlert — usados en todo el frontend
 export const COLORS = {
   // Primario
-  base: "#2A1B6D",
-  baseDark: "#1F1450",
-  baseLight: "#4A3AA8",
-  baseBg: "#F7F6FD",
+  base: "#51A2E2",
+  baseDark: "#3A87C4",
+  baseLight: "#6FB4E9",
+  baseBg: "#EAF4FC",
 
   // Semáforo — verde (seguro)
   green: "#2ECC71",
