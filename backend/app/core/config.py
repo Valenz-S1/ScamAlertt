@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     VERSION: str = "1.0.0"
 
     # Base de datos
-    DATABASE_URL: str = "postgresql://scamalert:scamalert123@localhost:5432/scamalert_db"
+    DATABASE_URL: str = "postgresql://scamalert:scamalert123@localhost:5432/scamalert"
 
     # Seguridad
     SECRET_KEY: str = "super-secret-key-change-in-production"
